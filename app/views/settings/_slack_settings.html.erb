@@ -24,6 +24,14 @@
 </p>
 
 <p>
+	<label for="settings_display_author">Display Author?</label>
+	<select id="settings_display_author" value="<%= settings['display_author'] %>" name="settings[display_author]">
+		<option value="yes">Yes</option>
+		<option value="no" <%= settings['display_author'] != 'yes' ? %q(selected="selected") : '' %>>No</option>
+	</select>
+</p>
+
+<p>
 	<label for="settings_display_watchers">Display Watchers?</label>
 	<select id="settings_display_watchers" value="<%= settings['display_watchers'] %>" name="settings[display_watchers]">
 		<option value="yes">Yes</option>
@@ -44,5 +52,13 @@
 	<select id="settings_display_assigned_to" value="<%= settings['display_assigned_to'] %>" name="settings[display_assigned_to]">
 		<option value="yes">Yes</option>
 		<option value="no" <%= settings['display_assigned_to'] != 'yes' ? %q(selected="selected") : '' %>>No</option>
+	</select>
+</p>
+
+<p>
+	<label for="settings_display_status_in_title">Display status in title?</label>
+	<select id="settings_display_status_in_title" value="<%= settings['display_status_in_title'] %>" name="settings[display_status_in_title]">
+		<option value="yes">Yes</option>
+		<option value="no" <%= settings['display_status_in_title'] != 'yes' ? %q(selected="selected") : '' %>>No</option>
 	</select>
 </p>

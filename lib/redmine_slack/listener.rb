@@ -1,4 +1,5 @@
 require 'httpclient'
+require 'pp'
 
 class SlackListener < Redmine::Hook::Listener
 	def controller_issues_new_after_save(context={})
@@ -9,15 +10,20 @@ class SlackListener < Redmine::Hook::Listener
 
 		return unless channel and url
 
-		msg = "[#{escape issue.project}] #{escape issue.author} created <#{object_url issue}|#{escape issue}>"
+		msg = "[#{escape issue.project}] "
+    msg += "#{escape issue.author} created " if Setting.plugin_redmine_slack[:display_author] == 'yes'
+    msg += "<#{object_url issue}|#{escape issue}>"
+    msg += "  - Status: *#{escape issue.status.to_s}*" if Setting.plugin_redmine_slack[:display_status_in_title] == 'yes'
 
 		attachment = {}
 		attachment[:text] = escape issue.description if issue.description
-		attachment[:fields] = [{
+		attachment[:fields] = []
+
+		attachment[:fields] << {
 			:title => I18n.t("field_status"),
 			:value => escape(issue.status.to_s),
 			:short => true
-		}]
+		} if Setting.plugin_redmine_slack[:display_status_in_title] == 'no'
 
 		attachment[:fields] << {
 			:title => I18n.t("field_assigned_to"),
@@ -49,8 +55,20 @@ class SlackListener < Redmine::Hook::Listener
 
 		return unless channel and url
 
-		msg = "[#{escape issue.project}] #{escape journal.user.to_s} updated <#{object_url issue}|#{escape issue}>"
-
+		msg = "[#{escape issue.project}] "
+    msg += "#{escape journal.user.to_s} updated " if Setting.plugin_redmine_slack[:display_author] == 'yes'
+    msg += "<#{object_url issue}|#{escape issue}>"
+    
+    if Setting.plugin_redmine_slack[:display_status_in_title] == 'yes'
+      journal.details.each do |d|
+        if d.prop_key == "status_id"
+    			status = IssueStatus.find(d.value) rescue nil
+    			value = escape status.to_s
+          msg += "  - Status: *#{value}*"
+        end
+      end
+    end
+    
 		attachment = {}
 		attachment[:text] = escape journal.notes if journal.notes
 		attachment[:fields] = journal.details.map { |d| detail_to_field d }
@@ -126,6 +144,7 @@ private
 	end
 
 	def detail_to_field(detail)
+
 		if detail.property == "cf"
 			key = CustomField.find(detail.prop_key).name rescue nil
 			title = key
@@ -136,6 +155,8 @@ private
 			key = detail.prop_key.to_s.sub("_id", "")
 			title = I18n.t "field_#{key}"
 		end
+
+    return if key == "status" and Setting.plugin_redmine_slack[:display_status_in_title] == 'yes'
 
 		short = true
 		value = escape detail.value.to_s
