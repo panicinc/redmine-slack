@@ -30,3 +30,19 @@
 		<option value="no" <%= settings['display_watchers'] != 'yes' ? %q(selected="selected") : '' %>>No</option>
 	</select>
 </p>
+
+<p>
+	<label for="settings_display_priority">Display Priority?</label>
+	<select id="settings_display_priority" value="<%= settings['display_priority'] %>" name="settings[display_priority]">
+		<option value="yes">Yes</option>
+		<option value="no" <%= settings['display_priority'] != 'yes' ? %q(selected="selected") : '' %>>No</option>
+	</select>
+</p>
+
+<p>
+	<label for="settings_display_assigned_to">Display Assignee?</label>
+	<select id="settings_display_assigned_to" value="<%= settings['display_assigned_to'] %>" name="settings[display_assigned_to]">
+		<option value="yes">Yes</option>
+		<option value="no" <%= settings['display_assigned_to'] != 'yes' ? %q(selected="selected") : '' %>>No</option>
+	</select>
+</p>

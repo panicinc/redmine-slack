@@ -17,15 +17,19 @@ class SlackListener < Redmine::Hook::Listener
 			:title => I18n.t("field_status"),
 			:value => escape(issue.status.to_s),
 			:short => true
-		}, {
-			:title => I18n.t("field_priority"),
-			:value => escape(issue.priority.to_s),
-			:short => true
-		}, {
+		}]
+
+		attachment[:fields] << {
 			:title => I18n.t("field_assigned_to"),
 			:value => escape(issue.assigned_to.to_s),
 			:short => true
-		}]
+		} if Setting.plugin_redmine_slack[:display_assigned_to] == 'yes'
+
+		attachment[:fields] << {
+			:title => I18n.t("field_priority"),
+			:value => escape(issue.priority.to_s),
+			:short => true
+		} if Setting.plugin_redmine_slack[:display_priority] == 'yes'
 
 		attachment[:fields] << {
 			:title => I18n.t("field_watcher"),
